@@ -2,7 +2,7 @@
 """States file
 """
 from api.v1.views import app_views
-from flask import jsonify, abort
+from flask import jsonify, abort, request
 from models import storage
 
 
@@ -16,11 +16,16 @@ def states():
     return jsonify(states)
 
 
-@app_views.route("/states/<state_id>", methods=['GET'])
+@app_views.route("/states/<state_id>", methods=['GET', 'DELETE'])
 def states_id(state_id):
     """Retrieves a State object: GET /api/v1/states/<state_id>
     """
     state = storage.get("State", state_id)
     if state is None:
         abort(404)
-    return jsonify(state.to_dict())
+    if request.method == "GET":
+        return jsonify(state.to_dict())
+    if request.method == "DELETE":
+        storage.delete(state)
+        storage.save()
+        return jsonify({}), 200
