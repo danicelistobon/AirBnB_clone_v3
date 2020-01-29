@@ -4,24 +4,27 @@
 from api.v1.views import app_views
 from flask import jsonify, abort, request
 from models import storage
-
+from models.state import State
 
 @app_views.route("/states", methods=['GET', 'POST'])
 def states():
     """Retrieves the list of all State objects: GET /api/v1/states
     """
-    if request.methods == 'GET':
+    if request.method == 'GET':
         states = []
         for state in storage.all("State").values():
             states.append(state.to_dict())
         return jsonify(states)
-    if request.methods == 'POST':
-        json = request.get_json()
-        if json is None:
+    if request.method == 'POST':
+        json_state = request.get_json()
+        if json_state is None:
             abort(400, "Not a JSON")
-        if json.get('name') is None:
+        if "name" not in json_state:
             abort(400, "Missing name")
-    return jsonify()
+        state = State()
+        state.name = json_state['name']
+        storage.save()
+        return jsonify(state.to_dict()), 200
 
 
 @app_views.route("/states/<state_id>", methods=['GET', 'DELETE'])
