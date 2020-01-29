@@ -6,6 +6,7 @@ from flask import jsonify, abort, request
 from models import storage
 from models.state import State
 
+
 @app_views.route("/states", methods=['GET', 'POST'])
 def states():
     """Retrieves the list of all State objects: GET /api/v1/states
@@ -23,11 +24,13 @@ def states():
             abort(400, "Missing name")
         state = State()
         state.name = json_state['name']
+        storage.new(state)
         storage.save()
+        storage.reload()
         return jsonify(state.to_dict()), 200
 
 
-@app_views.route("/states/<state_id>", methods=['GET', 'DELETE'])
+@app_views.route("/states/<state_id>", methods=['GET', 'DELETE', 'PUT'])
 def states_id(state_id):
     """Retrieves a State object: GET /api/v1/states/<state_id>
     """
@@ -40,3 +43,12 @@ def states_id(state_id):
         storage.delete(state)
         storage.save()
         return jsonify({}), 200
+    if request.method == "PUT":
+        json_state = request.get_json
+        if json_state is None:
+            abort(400, "Not a JSON")
+        for key, value in request.get_json().items():
+            if key not in ['id', 'created_at', 'updated_at']:
+                setattr(state, key, value)
+        storage.save()
+        return jsonify(state.to_dict()), 200
