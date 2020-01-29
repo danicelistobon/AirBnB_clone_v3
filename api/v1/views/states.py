@@ -6,14 +6,22 @@ from flask import jsonify, abort, request
 from models import storage
 
 
-@app_views.route("/states", methods=['GET'])
+@app_views.route("/states", methods=['GET', 'POST'])
 def states():
     """Retrieves the list of all State objects: GET /api/v1/states
     """
-    states = []
-    for state in storage.all("State").values():
-        states.append(state.to_dict())
-    return jsonify(states)
+    if request.methods == 'GET':
+        states = []
+        for state in storage.all("State").values():
+            states.append(state.to_dict())
+        return jsonify(states)
+    if request.methods == 'POST':
+        json = request.get_json()
+        if json is None:
+            abort(400, "Not a JSON")
+        if json.get('name') is None:
+            abort(400, "Missing name")
+   return jsonify()
 
 
 @app_views.route("/states/<state_id>", methods=['GET', 'DELETE'])
