@@ -21,7 +21,7 @@ def states():
             abort(400, "Not a JSON")
         if json.get('name') is None:
             abort(400, "Missing name")
-   return jsonify()
+    return jsonify()
 
 
 @app_views.route("/states/<state_id>", methods=['GET', 'DELETE'])
