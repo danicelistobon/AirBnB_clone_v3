@@ -22,8 +22,7 @@ def states():
             abort(400, "Not a JSON")
         if "name" not in json_state:
             abort(400, "Missing name")
-        state = State()
-        state.name = json_state['name']
+        state = State(**json_state)
         storage.new(state)
         storage.save()
         storage.reload()
