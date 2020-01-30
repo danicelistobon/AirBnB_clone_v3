@@ -20,7 +20,7 @@ def states():
         json_state = request.get_json()
         if json_state is None:
             abort(400, "Not a JSON")
-        if "name" not in json_state:
+        if not json_state.get('name'):
             abort(400, "Missing name")
         state = State(**json_state)
         storage.new(state)
