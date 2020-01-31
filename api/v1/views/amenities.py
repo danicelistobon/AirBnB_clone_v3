@@ -1,26 +1,19 @@
 #!/usr/bin/python3
-
-"""Amenity file
+"""Amenities file
 """
 from api.v1.views import app_views
 from flask import jsonify, abort, request
 from models import storage
-from models.state import State
 from models.amenity import Amenity
 
 
 @app_views.route("/amenities", methods=['GET', 'POST'])
-def amenities(state_id):
-    """methods GET and POST of the cities by states (state_ID)
+def amenities():
+    """methods GET and POST of the amenities
     """
-    amenities_st = storage.get("State", state_id)
-
-    if amenities_st is None:
-        abort(404)
-
     if request.method == 'GET':
         amenities_list = []
-        for amenity in amenities_st.amenities:
+        for amenity in storage.all("Amenity").values():
             amenities_list.append(amenity.to_dict())
         return jsonify(amenities_list)
 
@@ -30,7 +23,6 @@ def amenities(state_id):
             abort(400, "Not a JSON")
         if not json_amenity.get("name"):
             abort(400, "Missing name")
-        json_amenity["state_id"] = state_id
         amenity = Amenity(**json_amenity)
         storage.new(amenity)
         storage.save()
@@ -40,7 +32,7 @@ def amenities(state_id):
 
 @app_views.route("/amenities/<amenity_id>", methods=['GET', 'DELETE', 'PUT'])
 def amenities_id(amenity_id):
-    """methods GET, DELETE and PUT of the cities by city_ID
+    """methods GET, DELETE and PUT of the amenities by amenity_ID
     """
     amenity = storage.get("Amenity", amenity_id)
 
@@ -60,7 +52,7 @@ def amenities_id(amenity_id):
         if json_amenity is None:
             abort(400, "Not a JSON")
         for key, value in request.get_json().items():
-            if key not in ['id', 'created_at', 'updated_at', 'state_id']:
+            if key not in ['id', 'created_at', 'updated_at']:
                 setattr(amenity, key, value)
         storage.save()
         return jsonify(amenity.to_dict()), 200
