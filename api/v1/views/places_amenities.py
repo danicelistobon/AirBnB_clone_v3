@@ -9,7 +9,7 @@ from models.amenity import Amenity
 
 
 @app_views.route("/places/<place_id>/amenities", methods=['GET'])
-def amenities(place_id):
+def amenities_(place_id):
     """methods GET of the amenities by places (place_ID)
     """
     amenities_pl = storage.get("Place", place_id)
@@ -25,7 +25,7 @@ def amenities(place_id):
 
 @app_views.route("/places/<place_id>/amenities/<amenity_id>",
                  methods=['DELETE', 'POST'])
-def amenities_id(review_id):
+def amenities_id_(review_id):
     """methods DELETE and POST of the amenities by place_ID and amenity_ID
     """
     place = storage.get("Place", place_id)
