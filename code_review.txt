@@ -1,0 +1,4 @@
+Daniel Celis Tobon
+
+In the file: 'api/v1/views/states.py'
+Incomplete function docstrings
